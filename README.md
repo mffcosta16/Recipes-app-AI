@@ -91,7 +91,24 @@ Run the tests:
 ./mvnw test
 ```
 
+## Development workflow
+
+- Work happens on feature branches, merged into `main` via PR — never commit directly to `main`.
+- **Issues**: use the `create-issue` skill to file a use case/task/bug as a GitHub issue, following
+  [`.github/ISSUE_TEMPLATE.md`](.github/ISSUE_TEMPLATE.md).
+- **Pull requests**: use the `create-pr` skill to draft, review (general + the project-specific
+  `recipe-architecture-reviewer` agent), and merge a PR, following
+  [`.github/pull_request_template.md`](.github/pull_request_template.md). PR titles follow
+  `#<issue-number> - <short description>`.
+- Commits that implement an issue reference it, e.g. `Refs #12` or `Closes #12`.
+- CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs GitLeaks secret scanning and the test
+  suite on every push/PR to `main`.
+
+See [`CLAUDE.md`](CLAUDE.md) for architecture/domain conventions Claude Code follows in this repo.
+
 ## Status
 
-Backend bootstrap and the domain layer's design are in place. Application/infrastructure/web layers,
-persistence (Postgres schema + migrations), CI, and the React frontend are still to come.
+Backend bootstrap (Spring Boot + Docker Compose + CI + dev workflow tooling) is in place. The domain
+layer is currently being rewritten by hand (previous version deleted intentionally, to be rebuilt against
+the conventions in `CLAUDE.md` with the review agent checking the work). Application/infrastructure/web
+layers, persistence (Postgres schema + migrations), and the React frontend are still to come.
