@@ -1,0 +1,113 @@
+@startuml domain-model
+title Recipe Management - Domain Model (v1)
+skinparam classAttributeIconSize 0
+hide circle
+
+package "User (aggregate)" {
+  class User <<AggregateRoot>> {
+    - id: UserId
+    - username: Username
+    - email: Email
+  }
+  class UserId <<ValueObject>>
+  class Username <<ValueObject>>
+  class Email <<ValueObject>>
+
+  User "1" *-- "1" UserId
+  User "1" *-- "1" Username
+  User "1" *-- "1" Email
+}
+
+package "Ingredient (aggregate)" {
+  class Ingredient <<AggregateRoot>> {
+    - id: IngredientId
+    - name: IngredientName
+  }
+  class IngredientId <<ValueObject>>
+  class IngredientName <<ValueObject>>
+
+  Ingredient "1" *-- "1" IngredientId
+  Ingredient "1" *-- "1" IngredientName
+}
+
+package "Recipe (aggregate)" {
+  class Recipe <<AggregateRoot>> {
+    - id: RecipeId
+    - title: Title
+    - authorId: UserId
+    - status: RecipeStatus
+    - createdAt: Instant
+    - updatedAt: Instant
+    - ingredients: List<RecipeIngredient>
+    - steps: List<Step>
+    --
+    + addIngredient(ingredientId, quantity)
+    + removeIngredient(ingredientId)
+    + addStep(description)
+    + removeStep(stepId)
+    + moveStep(from, to)
+    + rename(title)
+    + publish()
+    + archive()
+  }
+
+  class RecipeId <<ValueObject>>
+  class Title <<ValueObject>> {
+    - value: String
+    .. invariant ..
+    not null / not empty
+  }
+
+  enum RecipeStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+  }
+
+  class RecipeIngredient <<ValueObject>> {
+    - ingredientId: IngredientId
+    - quantity: Quantity
+    .. invariant (enforced by Recipe) ..
+    no duplicate ingredientId within a Recipe
+  }
+
+  class Quantity <<ValueObject>> {
+    - amount: BigDecimal
+    - unit: Unit
+    .. invariant ..
+    amount must be positive
+  }
+
+  enum Unit {
+    GRAM
+    KILOGRAM
+    MILLILITER
+    LITER
+    PIECE
+    TEASPOON
+    TABLESPOON
+    CUP
+  }
+
+  class Step <<ValueObject>> {
+    - order: int
+    - description: String
+    .. invariant (enforced by Recipe) ..
+    order is contiguous, 1..N, managed
+    exclusively by Recipe (no client-set order)
+  }
+
+  Recipe "1" *-- "1" RecipeId
+  Recipe "1" *-- "1" Title
+  Recipe "1" *-- "1" RecipeStatus
+  Recipe "1" *-- "0..*" RecipeIngredient : ingredients
+  Recipe "1" *-- "0..*" Step : steps
+  RecipeIngredient "1" *-- "1" Quantity
+  Quantity "1" *-- "1" Unit
+}
+
+' -- Cross-aggregate references: by ID only, never by object reference --
+Recipe ..> UserId : authorId (reference)
+RecipeIngredient ..> IngredientId : ingredientId (reference)
+
+@enduml
