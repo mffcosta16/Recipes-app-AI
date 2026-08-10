@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        run: |
+          wget https://github.com/gitleaks/gitleaks/releases/download/v8.27.2/gitleaks_8.27.2_linux_x64.tar.gz
+          tar -xzf gitleaks_8.27.2_linux_x64.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+          gitleaks version
+
+      - name: Run Gitleaks
+        id: gitleaks
+        continue-on-error: true
+        run: |
+          gitleaks detect \
+            --source . \
+            --report-format json \
+            --report-path gitleaks-report.json \
+            --exit-code 1
+
+      - name: Post Gitleaks comment on PR
+        if: steps.gitleaks.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = '## Gitleaks – Secret Detection Failed\n\n';
+
+            try {
+              const report = JSON.parse(fs.readFileSync('gitleaks-report.json', 'utf8'));
+
+              if (report.length === 0) {
+                body += 'No secrets found.';
+              } else {
+                body += `**${report.length} secret(s) detected:**\n\n`;
+                body += '| Rule | File | Line |\n|---|---|---|\n';
+
+                for (const finding of report) {
+                  body += `| \`${finding.RuleID}\` | \`${finding.File}\` | ${finding.StartLine} |\n`;
+                }
+
+                body += '\n> ⚠️ Remove the secret, rotate the credential, and purge it from Git history.';
+              }
+            } catch (e) {
+              body += '_Could not parse Gitleaks report._';
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+
+      - name: Upload Gitleaks report
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+
+      - name: Fail if Gitleaks found leaks
+        if: steps.gitleaks.outcome == 'failure'
+        run: exit 1
+
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build and test
+        run: ./mvnw -B test
