@@ -58,6 +58,13 @@ to adjust scope, add context, or change the test plan. Only run `gh pr create` a
 - Summarize findings for the user. If there are unresolved high-severity findings, say so plainly and ask
   whether to fix them before proceeding — never merge over unresolved correctness issues without the user
   explicitly choosing to anyway.
+- Post the findings as a `gh pr comment` on the PR, whether or not anything was found (a clean review is
+  worth recording too). One consolidated comment per review pass, covering both the general review and the
+  architecture review, structured roughly as: what each review checked, what it found, and — if anything
+  was fixed as a result — a short note of what changed and in which commit. Do this automatically as part
+  of the review step; it doesn't need separate confirmation, since posting review results is what this step
+  is for. If findings get fixed and you re-review, post a follow-up comment rather than editing the
+  original.
 
 ## 6. Merge — only with explicit confirmation, every time
 
