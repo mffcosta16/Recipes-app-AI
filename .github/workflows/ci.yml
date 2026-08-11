@@ -95,5 +95,8 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Set up local Postgres credentials
+        run: cp .env.example .env
+
       - name: Build and test
         run: ./mvnw -B test
