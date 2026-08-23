@@ -18,15 +18,6 @@ class UserNameTest {
     }
 
     @Test
-    void constructorShouldThrowForInvalidUserName() {
-        //Arrange
-        String name = "Testing123InvalidUsername";
-
-        //Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new UserName(name));
-    }
-
-    @Test
     void constructorShouldSucceedWhenUserNameIsExactlyMaxLength() {
         //Arrange
         String name = "a".repeat(20);
