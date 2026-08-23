@@ -1,36 +1,38 @@
 package com.recipes.domain.user;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EmailTest {
 
     @Test
-    void constructorForValidEmail() {
-        //Arrange + Act + Assert
-        new Email("test@gmail.com");
+    void constructorShouldSucceedForValidEmail() {
+        //Arrange + Act
+        Email email = new Email("test@gmail.com");
 
+        //Assert
+        assertEquals("test@gmail.com", email.email());
     }
 
-    @Test
-    void constructorForInvalidEmail() {
-        //Arrange
-        String email1 = "test123.pt";
-        String email2 = "@test123.com";
-        String email3 = "test123@@com";
-        String email4 = "test123@.o/la";
-        String email5 = "test/123/@.com";
-        String email6 = "test@.";
-
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "test123.pt",
+            "@test123.com",
+            "test123@@com",
+            "test123@.o/la",
+            "test/123/@.com",
+            "test@.",
+            "test 123@gmail.com",
+            "test123@gmail .com",
+    })
+    void constructorShouldThrowForInvalidEmailFormat(String invalidEmail) {
         //Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new Email(email1));
-        assertThrows(IllegalArgumentException.class, () -> new Email(email2));
-        assertThrows(IllegalArgumentException.class, () -> new Email(email3));
-        assertThrows(IllegalArgumentException.class, () -> new Email(email4));
-        assertThrows(IllegalArgumentException.class, () -> new Email(email5));
-        assertThrows(IllegalArgumentException.class, () -> new Email(email6));
+        assertThrows(IllegalArgumentException.class, () -> new Email(invalidEmail));
     }
 
     @Test
@@ -67,5 +69,28 @@ class EmailTest {
         assertEquals("test123@gmail.com", emailTest1.email());
         assertEquals("testemail@hotmail.com", emailTest2.email());
         assertEquals("test@gmail.com", emailTest3.email());
+    }
+
+    @Test
+    void equalsAndHashCodeShouldBeBasedOnNormalizedValue() {
+        //Arrange
+        Email email1 = new Email("Test@Gmail.com");
+        Email email2 = new Email(" TEST@GMAIL.COM ");
+        Email email3 = new Email("other@gmail.com");
+
+        //Act + Assert
+        assertEquals(email1, email2);
+        assertEquals(email1.hashCode(), email2.hashCode());
+        assertNotEquals(email1, email3);
+        assertNotEquals(email1.hashCode(), email3.hashCode());
+    }
+
+    @Test
+    void toStringShouldContainTheEmailValue() {
+        //Arrange
+        Email email = new Email("test@gmail.com");
+
+        //Act + Assert
+        assertEquals("Email[email=test@gmail.com]", email.toString());
     }
 }
