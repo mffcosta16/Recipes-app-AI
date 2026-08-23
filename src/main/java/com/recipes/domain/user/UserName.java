@@ -11,12 +11,12 @@ public record UserName(String name) implements ValueObject {
 
     public UserName {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Username must not be null or blank");
+            throw new UserException("Username must not be null or blank");
         }
         String trimmed = name.trim();
 
         if (trimmed.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException("Username must not exceed " + MAX_LENGTH + " characters");
+            throw new UserException("Username must not exceed " + MAX_LENGTH + " characters");
         }
 
         name = trimmed.toLowerCase();

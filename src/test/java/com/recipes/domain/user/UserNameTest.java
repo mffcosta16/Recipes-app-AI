@@ -35,7 +35,7 @@ class UserNameTest {
         String name = "a".repeat(21);
 
         //Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new UserName(name));
+        assertThrows(UserException.class, () -> new UserName(name));
     }
 
     @Test
@@ -44,7 +44,7 @@ class UserNameTest {
         String name = null;
 
         //Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new UserName(name));
+        assertThrows(UserException.class, () -> new UserName(name));
     }
 
     @Test
@@ -53,7 +53,7 @@ class UserNameTest {
         String name = "";
 
         //Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new UserName(name));
+        assertThrows(UserException.class, () -> new UserName(name));
     }
 
     @Test

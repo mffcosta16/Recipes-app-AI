@@ -14,12 +14,12 @@ public record Email(String email) implements ValueObject {
 
     public Email {
         if ( email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email must not be null or blank");
+            throw new UserException("Email must not be null or blank");
         }
         String trimmed = email.trim();
 
         if(!FORMAT.matcher(trimmed).matches()) {
-            throw new IllegalArgumentException("Email is not a valid format: " + email);
+            throw new UserException("Email is not a valid format: " + email);
         }
 
         email = trimmed.toLowerCase();

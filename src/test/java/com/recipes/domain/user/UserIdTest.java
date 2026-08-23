@@ -21,7 +21,7 @@ class UserIdTest {
     @Test
     void constructorShouldThrowWhenIdIsNull() {
         //Act + Assert
-        assertThrows(NullPointerException.class, () -> new UserId(null));
+        assertThrows(UserException.class, () -> new UserId(null));
 
     }
 

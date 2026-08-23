@@ -32,7 +32,7 @@ class EmailTest {
     })
     void constructorShouldThrowForInvalidEmailFormat(String invalidEmail) {
         //Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new Email(invalidEmail));
+        assertThrows(UserException.class, () -> new Email(invalidEmail));
     }
 
     @Test
@@ -41,7 +41,7 @@ class EmailTest {
         String email = null;
 
         //Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new Email(email));
+        assertThrows(UserException.class, () -> new Email(email));
     }
 
     @Test
@@ -50,7 +50,7 @@ class EmailTest {
         String email = " ";
 
         // Act + Assert
-        assertThrows(IllegalArgumentException.class, () -> new Email(email));
+        assertThrows(UserException.class, () -> new Email(email));
     }
 
     @Test
