@@ -70,6 +70,14 @@ new domain code, rather than treating these as a fixed checklist:
 For the exact rules `Recipe` currently enforces (publish invariants, lifecycle, duplicate ingredients,
 step ordering), read `Recipe.java` — it's the source of truth, not this file.
 
+## Git workflow
+
+- **Never commit directly to `main`.** All changes go through a feature branch and a PR, even for small
+  or solo changes — this keeps `main` always green and lets CI validate a change before it lands.
+- **Commit messages are a single line** (summary only, plus the `Co-Authored-By` trailer). Don't add a
+  body paragraph unless the *why* genuinely isn't obvious from the diff or summary alone (e.g. a
+  non-obvious bug fix or a deliberate architectural tradeoff) — don't add one reflexively.
+
 ## Tooling
 
 - CI (`.github/workflows/ci.yml`) runs GitLeaks secret scanning (posts findings as a PR comment) and
